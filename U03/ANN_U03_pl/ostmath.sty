@@ -1,0 +1,431 @@
+\typeout{Document Style `ostmath'}
+
+%  ==================================================
+% LaTeX Style Datei für die Mathematik Übungsserien und Prüfungen der Mathe-
+% matik Ausbildung im Bachelor und Master and der Ostschweizer Fachhochschule
+% OST
+%
+% Stand 11. Januar 2022
+%  ==================================================
+
+
+%  ==================================================
+% Teil 1: Laden der benötigten  packages:
+%  ==================================================
+
+% Alles um Deutsch und die neue deutsche Rechtschreibung herum:
+\usepackage[ngerman]{babel}
+
+% Deutsche Umlaute im Source-Text werden verstanden:
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{multicol}
+
+% tikz package fuer fortgeschrittene Grafiken
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage[export]{adjustbox}
+\usepackage{eso-pic}
+\usepackage{graphicx}
+% Für verbesserte Headers:
+\usepackage{scrlayer-scrpage}
+
+% AMS Pakete für mathematische Symbole
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Die Items bei einer itemize/enumerate-Umgebung sind  linksbündig:
+\usepackage{enumitem}
+\setenumerate[1]{label={(\alph*)}}
+
+% weitere Pakete
+\usepackage{hyperref}
+\usepackage{xstring}
+
+% Für das handling für booleans und ifthenelse Steuerstrukturen
+\usepackage{ifthen}
+
+\newcommand{\pictureincenteroftextblock}[2][]{%
+  \AddToShipoutPictureBG*{%
+    \AtTextLowerLeft{%
+      \raisebox{.5\textheight}{%
+        \hspace*{.5\textwidth}%
+        \makebox[0pt]{\includegraphics[width=0.9\paperwidth, height=0.9\paperheight,valign=c,#1]{#2}}%
+      }%
+    }%
+  }%
+}
+
+%  ==================================================
+% Teil 2: Logik für verschiedene Modi der Serien
+%  ==================================================
+
+% Option für Musterlösungen
+\newboolean{printlong}
+\setboolean{printlong}{false}
+\DeclareOption{langeloesung}{
+\setboolean{printlong}{true}
+}
+
+% Option für kurze Lösungen
+\newboolean{printshort}
+\setboolean{printshort}{false}
+\DeclareOption{kurzeloesung}{
+\setboolean{printshort}{true}
+}
+
+% Option für Prüfungsbögen
+\newboolean{isexam}
+\setboolean{isexam}{false}
+\DeclareOption{pruefung}{
+\setboolean{isexam}{true}
+}
+
+% Option um Lösungen nach den jeweiligen Aufgaben zu zeigen
+\newboolean{printatend}
+\setboolean{printatend}{true}
+
+\DeclareOption{inline}{
+\setboolean{printatend}{false}
+}
+
+% Option Formelsammlung
+\newboolean{isformelsammlung}
+\setboolean{isformelsammlung}{false}
+
+\DeclareOption{formelsammlung}{
+	\setboolean{isformelsammlung}{true}
+}
+
+% Option Projekt
+\newboolean{isproject}
+\setboolean{isproject}{false}
+
+\DeclareOption{projekt}{
+	\setboolean{isproject}{true}
+}
+
+
+\ProcessOptions\relax
+
+% Laden des zugrundeliegenden answers Paketes 
+\ifthenelse{\boolean{printatend}} {
+    \usepackage{answers}
+}{
+    \usepackage[nosolutionfiles]{answers}
+    \setboolean{printshort}{false}
+    \setboolean{printlong}{false}
+}
+\renewcommand{\solutionextension}{aux} 
+
+
+% Verbesserte verbatim-Umgebung:
+\usepackage{exsheets-listings}
+\lstset{language=Matlab,basicstyle=\ttfamily,breaklines=true}
+\usepackage{verbatim}
+
+
+%  ==================================================
+% Teil 3: Definitionen
+%  ==================================================
+
+
+% Keine Paragrapheneinrueckung:
+\setlength{\parindent}{0pt}
+
+% Etwas vergrösserter Zeilenabstand:
+\renewcommand{\baselinestretch}{1.2}
+
+% Modul-, Kurs-, und Studiumsnamen, Kapitelnummern, etc. 
+\newcommand{\modulname}{--- Modulname undefiniert ---}
+\newcommand{\Modulname}[1]{\renewcommand{\modulname}{#1}}
+\newcommand{\kursname}{--- Kursname undefiniert ---}
+\newcommand{\Kursname}[1]{\renewcommand{\kursname}{#1}}
+\newcommand{\kapitelname}{--- Kapitelname undefiniert ---}
+\newcommand{\Kapitelname}[1]{\renewcommand{\kapitelname}{#1}}
+\newcommand{\kapitelnameZwei}{}
+\newcommand{\KapitelnameZwei}[1]{\renewcommand{\kapitelnameZwei}{#1}}
+\newcommand{\semester}{--- Semester undefiniert ---}
+\newcommand{\Semester}[1]{\renewcommand{\semester}{#1}}
+\newcommand{\kapitelnummer}{--- Kapitelnummer undefiniert ---}
+\newcommand{\Kapitelnummer}[1]{\renewcommand{\kapitelnummer}{#1}}
+
+% Die Aufgaben werden auch im Fliesstext normalerweise mit \displaystyle = \D gesetzt:
+\newcommand{\D}{\displaystyle}
+
+% Mengensymbole fuer die reellen, natuerlichen, ganzen, rationalen und komplexen Zahlen:
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+
+% Real- und Imaginaerteil:
+\renewcommand{\Re}{\mbox{Re}}
+\renewcommand{\Im}{\mbox{Im}}
+
+% Vektor:
+\newcommand{\vect}[1]{\left(\!\begin{array}{r} #1 \end{array}\!\right)}
+
+% "MATLAB":
+\newcommand{\MATLAB}{{M{\fontsize{10}{12}\selectfont{}ATLAB}}}
+
+% Retrofit für alte Textformatierungsmethoden
+\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
+\DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
+\DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
+\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
+
+%OST Farb-Definitionen
+\xdefinecolor{hellgrau}{RGB}{198, 198, 198}
+\xdefinecolor{brombeer}{RGB}{140, 25, 95}
+\xdefinecolor{himbeer}{RGB}{215,40,100}
+\xdefinecolor{dunkelviolett}{RGB}{107, 56, 129}
+\xdefinecolor{hellviolett}{RGB}{208, 169, 208}
+\xdefinecolor{dunkelgruen}{RGB}{0,126,107}
+\xdefinecolor{hellgruen}{RGB}{167,213,194}
+\xdefinecolor{dunkelrot}{RGB}{195,46,21}
+\xdefinecolor{hellrot}{RGB}{243,154,139}
+
+% Zählvariable für Musterlösungen
+\newcounter{longsolcnt}
+
+%  ==================================================
+% Teil 4: Definition des Headers auf der Titleseite
+%
+% Je nach gewünschtem Dokumenttyp (Übungen, Prüfungen, ...) wird der Header
+% anders gesetzt. 
+%  ==================================================
+
+% Höhe des Headers im Original-LaTeX:
+\setlength{\headheight}{1.5\baselineskip}
+
+% Header ab Seite 2 ohne Abstand zwischen Text und grauer Box (mal als besonderes Design fuer dieses Jahr ...):
+\setlength{\fboxsep}{0pt}
+
+% Definition der Header ab Seite 2
+\defpagestyle{myheader}{%
+{\colorbox{white}{\parbox{1\textwidth}{\normalfont\thepage\hfill\sffamily\kapitelnummer\ \kapitelname, \semester}}}
+{\colorbox{white}{\parbox{1\textwidth}{\normalfont\sffamily\kapitelnummer\ \kapitelname, \semester\hfill\thepage}}}
+{\colorbox{white}{\parbox{1\textwidth}{\normalfont\sffamily\kapitelnummer\ \kapitelname, \semester\hfill\thepage}}}}{{}{}{}}
+\pagestyle{myheader} % Der Header ab Seite 2
+
+% Definition der Header ab Seite 2
+\defpagestyle{headerlongsol}{%
+{\colorbox{white}{\parbox{1\textwidth}{\normalfont\thepage\hfill\sffamily\kapitelnummer\ \kapitelname, \semester}}}
+{\colorbox{white}{\parbox{1\textwidth}{\normalfont\sffamily\kapitelnummer\ \kapitelname, \semester\hfill Musterl\"osung\; \thelongsolcnt}}}
+{\colorbox{white}{\parbox{1\textwidth}{\normalfont\sffamily\kapitelnummer\ \kapitelname, \semester\hfill Musterl\"osung\; \thelongsolcnt}}}}{{}{}{}}
+
+\let\tempmargin\oddsidemargin
+\let\oddsidemargin\evensidemargin
+\let\evensidemargin\tempmargin
+\reversemarginpar
+
+\thispagestyle{empty} % auf Seite 1 keinen Header dieser Art
+
+
+% Definition des grossen Headers auf der ersten Seite:
+\ifthenelse{\boolean{isformelsammlung}}
+{\newcommand{\TitelKopf}{% Header für Formelsammlungen
+		\vspace*{-10mm}
+		\hfill\raisebox{-0.7cm}{\includegraphics[width=4.2cm]{OST}}
+		
+		\vspace*{8mm}
+		\hrule
+		
+		\sffamily\textbf{\begin{tabular}[c]{l} \LARGE
+				\kapitelnummer\ \kapitelname \\
+				\LARGE {\color{white}\kapitelnummer}\ \kapitelnameZwei
+			\end{tabular}}
+			\hfill\large
+			\begin{tabular}[b]{r}
+				Systemtechnik BSc \\
+				\semester
+			\end{tabular} \\
+			
+			\vspace{10mm}
+            \ 
+			\hfill
+			\kursname\ im Modul \modulname 
+			
+			\hrule
+			\vspace{8mm}
+		}}{
+\ifthenelse{\boolean{isexam}} 
+{\newcommand{\TitelKopf}{% Header für Prüfungen
+\vspace*{-10mm}
+\hfill\raisebox{-0.7cm}{\includegraphics[width=4.2cm]{OST}}
+
+\vspace*{8mm}
+\hrule
+\sffamily\textbf{\LARGE
+\kapitelnummer\ \kapitelname} 
+\hfill\large
+\begin{tabular}[b]{r}
+Systemtechnik BSc \\
+\semester
+\end{tabular} \\
+
+\kursname\ im Modul \modulname 
+
+\hrule
+\vspace{8mm}
+{\small
+	\textbf{%
+		Bitte beachten: \\
+		-- Lösen Sie die Aufgaben direkt auf die Blätter. Blätter bitte nicht auseinander nehmen. \\
+		-- Es sind 5 Aufgaben. Jede Aufgabe gibt gleich viele Punkte. \\
+		-- Punkteabzug oder keine Punkte für unvollständige oder schwer verständliche Lösungswege, \\ \phantom{--} formal inkorrekte Schreibweise sowie für nicht vollständig vereinfachte Resultate. \\
+		-- Hilfsmittel: Papula Formelsammlung, kein Taschenrechner. \\
+		-- Zeit: 90 Minuten.
+	}
+}
+
+\vspace*{10mm}
+
+\setlength{\fboxrule}{0.5mm}
+\fbox{\rule{0mm}{8mm} \tiny{Name} \hspace{60mm}}
+\fbox{\rule{0mm}{8mm} \tiny{Vorname} \hspace{50mm}}
+\fbox{\rule{0mm}{8mm} \tiny{Klasse} \hspace{15mm}}
+
+\vspace*{20mm}
+
+\setlength{\fboxrule}{0.1mm}
+\begin{tabular}[b]{@{}ll}
+	\raisebox{3mm}{\textbf{Aufgabe 1:}} & \fbox{\rule{0mm}{8mm} \tiny{Pt.} \hspace{10mm}} \\
+	\raisebox{3mm}{\textbf{Aufgabe 2:}} & \fbox{\rule{0mm}{8mm} \tiny{Pt.} \hspace{10mm}} \\
+	\raisebox{3mm}{\textbf{Aufgabe 3:}} & \fbox{\rule{0mm}{8mm} \tiny{Pt.} \hspace{10mm}} \\
+	\raisebox{3mm}{\textbf{Aufgabe 4:}} & \fbox{\rule{0mm}{8mm} \tiny{Pt.} \hspace{10mm}} \\
+	\raisebox{3mm}{\textbf{Aufgabe 5:}} & \fbox{\rule{0mm}{8mm} \tiny{Pt.} \hspace{10mm}} \\[3mm]
+	& \fbox{\rule{0mm}{8mm} \tiny{Pt.~total} \hspace{10mm}}\qquad\raisebox{3mm}{$\longrightarrow$}
+\end{tabular}\hfill\fbox{\rule{0mm}{8mm} \tiny{Note} \hspace{10mm}}
+
+}}
+{\newcommand{\TitelKopf}{% reguläre Übungen
+\vspace*{-30mm}
+\hfill\raisebox{-0.7cm}{\includegraphics[width=4.2cm]{OST}}
+
+\vspace*{8mm}
+\hrule
+
+\sffamily\textbf{\begin{tabular}[c]{l} \LARGE
+\ifthenelse{\boolean{isproject}}{}{\kapitelnummer\ }\kapitelname \\
+ \LARGE {\color{white}\kapitelnummer}\ \kapitelnameZwei
+\end{tabular}}
+\hfill\large
+\begin{tabular}[b]{r}
+Systemtechnik BSc \\
+\semester
+\end{tabular} \\
+
+
+\vspace{10mm}
+
+\ifthenelse{\boolean{isproject}} {
+{\LARGE Projekt}}{
+{\LARGE Aufgaben}}
+\hfill
+\kursname\ im Modul \modulname 
+
+\hrule
+\vspace{8mm}
+
+
+}}
+}
+
+
+%  ==================================================
+% Teil 5: Handling der Lösungen und Aufbau des Dokuments
+%
+%  
+%  ==================================================
+\newcommand{\mydo}[1]{ \@backslashchar item \expandafter\csname
+Full#1\endcsname  \@backslashchar\@backslashchar \expandafter\csname #1\endcsname }
+
+% Definition was unmittelbar nach \begin{document} kommt
+\AtBeginDocument{
+    \TitelKopf
+    \Opensolutionfile{kurzeLoesung}
+    \Opensolutionfile{langeLoesung}
+}
+% Definition was unmittalbar vor \end{document} gemacht wird. 
+\AtEndDocument{
+    \newwrite\myoutput
+    \immediate\openout\myoutput=lernziele.aux
+    \write\myoutput{\@backslashchar begin{itemize}}
+    \write\myoutput{\expandafter\forcsvlist\expandafter\mydo\expandafter{\Lernziele}}
+    \write\myoutput{\@backslashchar end{itemize}}
+
+    \Closesolutionfile{kurzeLoesung}
+    \Closesolutionfile{langeLoesung}
+
+    \ifthenelse{\boolean{printshort}} {
+        \IfFileExists{./kurzeLoesung.aux}{
+                \clearpage
+                \section*{Lösungen}	
+                \input{kurzeLoesung.aux}
+                %\newpage
+            }{}
+    }{}
+
+    \ifthenelse{\boolean{printlong}} {
+        \IfFileExists{./langeLoesung.aux}{%
+        	   \clearpage
+                \section*{Musterlösungen}
+								\newpage
+                \input{langeLoesung.aux} 
+        }{}
+    }{}
+}
+
+%Zeilenumbruch ohne Pagebreak für LongLoesungen
+\makeatletter\newcommand\mynobreakpar{~\par\nobreak\@afterheading}\makeatother
+
+% Funktion zur Einbindung von pdf Musterlösungen (mit mehreren Seiten)
+\newcommand{\includelongsolution}[2][0.6]{
+\mynobreakpar
+% scan pdf Datei; Die Variable \pdflastximagepages wird dann auf die Seitenzahl im pdf gesetzt
+\pdfximage{#2}
+
+\foreach \x in {1,...,\the\pdflastximagepages} {
+	\mbox{}% Just put something on this page.
+	\pictureincenteroftextblock[page=\x]{#2}
+	\thispagestyle{headerlongsol}
+  \clearpage 
+	}
+}
+
+
+%Definition der Kurz- und Musterlösungen
+\Newassociation{Loesung}{Solution}{kurzeLoesung}
+\Newassociation{LangLoesung}{LongSolution}{langeLoesung}
+
+% Das Environment Solution wird umdefiniert, das Label "Loesung xx" wird nicht
+% als Item key verwendet, sondern als Item value. Das führt dazu, dass es bei
+% nested enumerates trotzdem einen Zeilenumbruch gibt
+\renewenvironment{Solution}[1]{
+\begin{trivlist}\item \textbf{L\"osung #1. }}{\end{trivlist}}
+
+\newtheorem{aufgabeinnen}{Aufgabe}
+\newenvironment{Aufgabe}{\begin{aufgabeinnen}\hspace*{-0.45em}{\bf .}\normalfont\sffamily\ }{\end{aufgabeinnen}}
+
+\newcommand\preLongSolution{\setlength{\voffset}{-40pt}\setlength{\headsep}{80pt}}
+\renewcommand{\LongSolutionlabel}[1]{\setcounter{longsolcnt}{#1}}
+
+% Defition der Lernzielliste. Das File lernziele.aux wird nach dem ersten Kompilieren erstellt dann sobald es existiert 
+% in der jeweiligen Datei eingefügt. 
+\def \Lernziele{}
+\def\newLernziel#1#2{
+	\expandafter\gdef\csname Full#1\endcsname{#2}
+	\expandafter\gdef\csname #1\endcsname {  Aufgaben:}
+	\xdef\Lernziele {\Lernziele #1,}
+}
+\def\addlernziel#1{%
+    \expandafter\xdef\csname #1\endcsname{\csname #1\endcsname\ \arabic{aufgabeinnen}}%
+}
+
+
+
+
