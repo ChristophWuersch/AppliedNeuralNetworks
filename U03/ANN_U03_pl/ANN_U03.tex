@@ -19,6 +19,7 @@
 \usepackage{xcolor}
 \usepackage{inconsolata}
 \usepackage{multicol}
+\usepackage{float} % Am Anfang der Datei (Präambel)
 \usepackage{}
 
 \Modulname{ANN | WUCH}
@@ -117,28 +118,39 @@ In dieser Übungsaufgabe werden wir verschiedene \emph{gängige Regularisierungs
 	
 	\begin{enumerate}
 		%(a)
-		\item Laden Sie den Datensatz \texttt{HIGGS.csv.gz} von \href{http://mlphysics.ics.uci.edu/data/higgs/}{mlphysics.ics.uci.edu} herunter. Achtung: Es sind rund 2.7 GB an Daten. Legen Sie den Datensatz auf einen Ordner Ihrer Wahl ab. Sie brauchen das komprimierte File nicht zu entzippen.
+		\item \textbf{Daten laden:} Laden Sie den Datensatz \texttt{HIGGS.csv.gz} von \href{http://mlphysics.ics.uci.edu/data/higgs/}{mlphysics.ics.uci.edu} herunter. Achtung: Es sind rund 2.7 GB an Daten. Legen Sie den Datensatz auf einen Ordner Ihrer Wahl ab. Sie brauchen das komprimierte File nicht zu entzippen.
 		
 		Die Daten wurden mit Hilfe von Monte-Carlo-Simulationen erstellt. Die ersten 21 Merkmale (Spalten 2-22) sind kinematische Eigenschaften, die von den Teilchendetektoren im Beschleuniger gemessen wurden. Die letzten sieben Merkmale sind Funktionen der ersten 21 Merkmalen; es handelt sich dabei um hochrangige Merkmale, die von Physikern abgeleitet wurden, um zwischen den beiden Klassen zu unterscheiden. Das Ziel dieser Übungsserie ist nicht die Teilchenphysik, daher sollten Sie sich nicht mit den Details des Datensatzes beschäftigen. Er enthält 11'000'000 Beispiele, jedes mit 28 Merkmalen und einem binären Klassenlabel.
 		
 				
 		%(b)
-		\item Öffnen Sie das Jupyter-Template \texttt{overfit\_and\_underfit\_TEMPLATE.ipynb} und führen Sie die erste Code-Zelle aus, um die Daten zu laden. Passen Sie den Datenpfad entsprechend an. Beim Setup kann das Package ipywidgets installiert werden für schönere Ladebalken während des Trainings. Es enthält folgende Funktionen:
-		\begin{description}
-			\item[\texttt{download\_file\_if\_not\_exists}] Laden der Daten
-			\item[\texttt{config\_dict}] für allgemeine Einstellungen
-			\item[\texttt{HiggsDataset}] Klasse für die Daten
-			\item[\texttt{create\_model}] für das einfache Erstellen der Architektur
-			\item[\texttt{LightningModel}] Klasse für das Training
-			\item[\texttt{train\_model}] allgemeine Einstellungen für das Training für mehr Übersichtlichkeit
-			\item[\texttt{train\_with\_early\_stopping}] Early Stopping, um abzubrechen, falls das Modell nicht mehr verbessert
-		\end{description}
+		\item \textbf{Template:} Öffnen Sie das Jupyter-Template\\ \texttt{overfit\_and\_underfit\_TEMPLATE.ipynb} und führen Sie die erste Code-Zelle aus, um die Daten zu laden. Passen Sie den Datenpfad entsprechend an. Beim Setup kann das Package \texttt{ipywidgets} installiert werden für schönere Ladebalken während des Trainings. Das Jupyter-Template enthält folgende Hilfsfunktionen:
+		
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{l p{10cm}}
+			\hline
+			\textbf{Funktion} & \textbf{Beschreibung} \\
+			\hline
+			\texttt{download\_file\_if\_not\_exists} & Laden der Daten \\
+			\texttt{config\_dict} & für allgemeine Einstellungen \\
+			\texttt{HiggsDataset} & Klasse für die Daten \\
+			\texttt{create\_model} & für das einfache Erstellen der Architektur \\
+			\texttt{LightningModel} & Klasse für das Training \\
+			\texttt{train\_model} & allgemeine Einstellungen für das Training für mehr Übersichtlichkeit \\
+			\texttt{train\_with\_early\_stopping} & Early Stopping, um abzubrechen, falls das Modell nicht mehr verbessert \\
+			\hline
+		\end{tabular}
+		\caption{Übersicht der Funktionen und ihrer Beschreibungen}
+		\label{tab:functions}
+	\end{table}
+
 		
 		
 		%(c)
-		\item \textbf{Winziges Modell}: Um eine geeignete Modellgrösse zu finden, beginnen Sie am besten mit relativ wenigen Schichten und Parametern und beginnen dann, die Grösse der Schichten zu erhöhen oder neue Schichten hinzuzufügen, bis Sie eine Verringerung des Validierungsverlustes feststellen. Beginnen Sie mit einem einfachen Modell, das nur \texttt{nn.Linear}-Layers als Basis verwendet, erstellen Sie dann grössere Versionen und vergleichen Sie diese. Im Code ist eine \texttt{config\_dict} in der die Layers definiert werden.
+		\item \textbf{Winziges Modell}: Um eine geeignete Modellgrösse zu finden, starten Sie am besten mit relativ wenigen Schichten und Parametern. Beginnen dann, die Grösse der Schichten zu erhöhen oder neue Schichten hinzuzufügen, bis Sie eine Verringerung des Validierungsverlustes feststellen. Wir starten mit einem einfachen Modell, das nur \texttt{nn.Linear}-Layer als Basis verwendet. Erstellen Sie dann grössere Versionen und vergleichen Sie die Performence dieser Modelle mit einer geeigneten Metrik. Die Definition der Anzahl Lagen und Neuronen wird über ein Dictionary \texttt{config\_dict} definiert.
 		
-		\begin{lstlisting}[language=Python]
+\begin{lstlisting}[language=Python]
 config_tiny = {
 	"model": {
 		"input_size": 28,  # Eingangsgroesse des Modells
@@ -149,10 +161,10 @@ config_tiny = {
 		},  # Konfiguration fuer Tiny-Modell
 	},
 }
-		\end{lstlisting}
+\end{lstlisting}
 		
-		Trainieren Sie das kleine Modell mit folgenden Schritten und es wird auch direkt der Trainingsloss und Validierungsloss geplottet.
-		\begin{lstlisting}[language=Python]
+Trainieren Sie das kleine Modell mit folgenden Schritten. Der Trainings- und Validierungsloss wird geloggt und anschliessend für die Analyse des Bias-Variance Tradeoffs geplottet.
+\begin{lstlisting}[language=Python]
 print("Training Basis Tiny Model...")
 # printe die Konfiguration des Modells
 print(config_tiny["model"]["tiny"])
@@ -161,16 +173,14 @@ config_tiny["model"]["input_size"], **config_tiny["model"]["tiny"]
 )
 tiny_lightning_model = LightningModel(tiny_model)
 tiny_trained = train_with_early_stopping(
-tiny_lightning_model, train_loader, validate_loader
-)
-
-		\end{lstlisting}
+tiny_lightning_model, train_loader, validate_loader)
+\end{lstlisting}
 		
 		
-		%(e)
-		\item \textbf{Kleines Modell}: Um zu sehen, ob Sie die Leistung des kleinen Modells übertreffen können, trainieren Sie nach und nach einige grössere Modelle. Versuchen Sie es mit zwei versteckten Schichten mit je 16 Einheiten:
+%(e)
+\item \textbf{Kleines Modell}: Um zu sehen, ob Sie die Leistung des kleinen Modells übertreffen können, trainieren Sie nach und nach einige grössere Modelle. Versuchen Sie es mit zwei versteckten Schichten mit je 16 Einheiten:
 		
-		\begin{lstlisting}[language=Python]
+\begin{lstlisting}[language=Python]
 config_small = {
 	"model": {
 		"input_size": 28,  # Eingangsgroesse des Modells
@@ -181,10 +191,10 @@ config_small = {
 		},  # Konfiguration fuer Small-Modell
 	},
 }
-		\end{lstlisting}
+\end{lstlisting}
 		
-		Trainiert wird das Modell wie folgt:
-		\begin{lstlisting}[language=Python]
+Trainiert wird das Modell wie folgt:
+\begin{lstlisting}[language=Python]
 print("Training Small Model (Basis, [16,16])...")
 # printe die Konfiguration des Modells
 print(config_small["model"]["small"])
@@ -193,16 +203,15 @@ config_small["model"]["input_size"], **config_small["model"]["small"]
 )
 small_lightning_model = LightningModel(small_model)
 small_trained = train_with_early_stopping(
-small_lightning_model, train_loader, validate_loader
-)
-		\end{lstlisting}
+small_lightning_model, train_loader, validate_loader)
+\end{lstlisting}
 		
 		
 		
-		%(e)
-		\item \textbf{Mittleres Modell}: Testen Sie nun ein Modell mit drei versteckten Schichten (hidden layers) mit je 64 Einheiten.
+%(e)
+\item \textbf{Mittleres Modell}: Testen Sie nun ein Modell mit drei versteckten Schichten (hidden layers) mit je 64 Einheiten.
 		
-		\begin{lstlisting}[language=Python]
+\begin{lstlisting}[language=Python]
 config_medium = {
 	"model": {
 		"input_size": 28,  # Eingangsgroesse des Modells
@@ -213,10 +222,10 @@ config_medium = {
 		},  # Konfiguration fuer Medium-Modell
 	},
 }
-		\end{lstlisting}
+\end{lstlisting}
 		
-		Auch dieses Modell wird wie folgt Trainiert.
-		\begin{lstlisting}[language=Python]
+Auch dieses Modell wird wie folgt trainiert.
+\begin{lstlisting}[language=Python]
 print("Training Medium Model (Basis, [64,64,64])...")
 # printe die Konfiguration des Modells
 print(config_medium["model"]["medium"])
@@ -225,15 +234,14 @@ config_medium["model"]["input_size"], **config_medium["model"]["medium"]
 )
 medium_lightning_model = LightningModel(medium_model)
 medium_trained = train_with_early_stopping(
-medium_lightning_model, train_loader, validate_loader
-)
-		\end{lstlisting}
+medium_lightning_model, train_loader, validate_loader)
+\end{lstlisting}
 		
 		
-		%(f)
-		\item \textbf{Grosses Modell}: Als Nächstes fügen wir zu diesem Benchmark ein Netzwerk hinzu, das viel mehr Kapazität hat, weit mehr als das Problem rechtfertigen würde:
+%(f)
+\item \textbf{Grosses Modell}: Als nächstes fügen wir zu diesem Benchmark ein Netzwerk hinzu, das viel mehr Kapazität hat, weit mehr als das Problem rechtfertigen würde:
 		
-		\begin{lstlisting}[language=Python]
+\begin{lstlisting}[language=Python]
 config_large = {
 	"model": {
 		"input_size": 28,  # Eingangsgroesse des Modells
@@ -244,9 +252,9 @@ config_large = {
 		},  # Konfiguration fuer Large-Modell
 	},
 }
-		\end{lstlisting}
+\end{lstlisting}
 		
-		\begin{lstlisting}[language=Python]
+\begin{lstlisting}[language=Python]
 print("Training Large Model (Basis, [512,512,512,512])...")
 # printe die Konfiguration des Modells
 print(config_large["model"]["large"])
@@ -255,23 +263,22 @@ config_large["model"]["input_size"], **config_large["model"]["large"]
 )
 large_lightning_model = LightningModel(large_model)
 large_trained = train_with_early_stopping(
-large_lightning_model, train_loader, validate_loader
-)
-		\end{lstlisting}
+large_lightning_model, train_loader, validate_loader)
+\end{lstlisting}
 		
-		%(g)
-		\item \textbf{Interpretation}: Es werden alle Lernkurven zum Modell auch geplottet, beschreiben Sie in wenigen Sätzen, ob eine Über oder Unteranpassung erkennbar ist Anhand des Trainings- und Validierungslosses.	
-		%(h)
-		\item \textbf{Weight Regularization}: Vielleicht kennen Sie das Prinzip von \textsc{Occams} Rasiermesser: Wenn es zwei Erklärungen für etwas gibt, ist die Erklärung, die am wahrscheinlichsten richtig ist, die "`einfachste"', diejenige, die die wenigsten Annahmen enthält. Dies gilt auch für die Modelle, die von neuronalen Netzen gelernt werden: Bei bestimmten Trainingsdaten und einer Netzarchitektur gibt es mehrere Sätze von Gewichtungswerten (mehrere Modelle), die die Daten erklären könnten, und bei einfacheren Modellen ist die Wahrscheinlichkeit einer Überanpassung geringer als bei komplexen Modellen.
-		
-		Ein "`einfaches Modell"' ist in diesem Zusammenhang ein Modell, bei dem die Verteilung der Parameterwerte eine geringere \emph{Entropie} aufweist (oder ein Modell mit insgesamt weniger Parametern, wie wir im obigen Abschnitt gesehen haben). Eine gängige Methode zur Abschwächung der Überanpassung besteht daher darin, die Komplexität eines Netzes einzuschränken, indem seine Gewichte gezwungen werden, nur kleine Werte anzunehmen, wodurch die Verteilung der Gewichtswerte "`regelmässiger"' wird. Dies wird als \emph{Gewichtsregularisierung} bezeichnet und erfolgt durch Hinzufügen von Kosten zur Verlustfunktion des Netzes, die mit grossen Gewichten verbunden sind. Diese Kosten gibt es in zwei Varianten:
-		
-		\begin{itemize}
-			\item \href{https://developers.google.com/machine-learning/glossary/#L1_regularization}{\textbf{L1-Regularisierung}}, bei der die hinzugefügten Kosten proportional zum absoluten Wert der Gewichtskoeffizienten sind (d. h. zur so genannten L1-Norm der Gewichte).
-			
-			\item \href{https://developers.google.com/machine-learning/glossary/#L2_regularization}{\textbf{L2-Regularisierung}} bei der die zusätzlichen Kosten proportional zum Quadrat des Wertes der Gewichtungskoeffizienten sind (d.h. zu dem, was man die quadrierte L2-Norm der Gewichte nennt). Die L2-Regularisierung wird im Zusammenhang mit neuronalen Netzen auch als Gewichtsabnahme bezeichnet. 
+%(g)
+\item \textbf{Interpretation}: Es werden alle Lernkurven zum Modell auch geplottet, beschreiben Sie in wenigen Sätzen, ob eine Über oder Unteranpassung erkennbar ist Anhand des Trainings- und Validierungslosses.	
+%(h)
+\item \textbf{Weight Regularization}: Vielleicht kennen Sie das Prinzip von \textsc{Occams} Rasiermesser: Wenn es zwei Erklärungen für etwas gibt, ist die Erklärung, die am wahrscheinlichsten richtig ist, die "`einfachste"', diejenige, die die wenigsten Annahmen enthält. Dies gilt auch für die Modelle, die von neuronalen Netzen gelernt werden: Bei bestimmten Trainingsdaten und einer Netzarchitektur gibt es mehrere Sätze von Gewichtungswerten (mehrere Modelle), die die Daten erklären könnten, und bei einfacheren Modellen ist die Wahrscheinlichkeit einer Überanpassung geringer als bei komplexen Modellen.
 
-		\end{itemize}
+Ein "`einfaches Modell"' ist in diesem Zusammenhang ein Modell, bei dem die Verteilung der Parameterwerte eine geringere \emph{Entropie} aufweist (oder ein Modell mit insgesamt weniger Parametern, wie wir im obigen Abschnitt gesehen haben). Eine gängige Methode zur Abschwächung der Überanpassung besteht daher darin, die Komplexität eines Netzes einzuschränken, indem seine Gewichte gezwungen werden, nur kleine Werte anzunehmen, wodurch die Verteilung der Gewichtswerte "`regelmässiger"' wird. Dies wird als \emph{Gewichtsregularisierung} bezeichnet und erfolgt durch Hinzufügen von Kosten zur Verlustfunktion des Netzes, die mit grossen Gewichten verbunden sind. Diese Kosten gibt es in zwei Varianten:
+
+\begin{itemize}
+	\item \href{https://developers.google.com/machine-learning/glossary/#L1_regularization}{\textbf{L1-Regularisierung}}, bei der die hinzugefügten Kosten proportional zum absoluten Wert der Gewichtskoeffizienten sind (d. h. zur so genannten L1-Norm der Gewichte).
+	
+	\item \href{https://developers.google.com/machine-learning/glossary/#L2_regularization}{\textbf{L2-Regularisierung}} bei der die zusätzlichen Kosten proportional zum Quadrat des Wertes der Gewichtungskoeffizienten sind (d.h. zu dem, was man die quadrierte L2-Norm der Gewichte nennt). Die L2-Regularisierung wird im Zusammenhang mit neuronalen Netzen auch als Gewichtsabnahme bezeichnet. 
+
+\end{itemize}
 	
 		Die L1-Regularisierung verschiebt einige Gewichte genau gegen Null, was ein spärliches Modell fördert. Die L2-Regularisierung bestraft die Parameter der Gewichte, ohne sie spärlich zu machen, da die Strafe bei kleinen Gewichten gegen Null geht - ein Grund, warum L2 häufiger verwendet wird.
 		
