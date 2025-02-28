@@ -43,6 +43,6 @@ Ich werde in der ersten Woche die Vorlesung **hybrid** durchführen (**KW8 in Bu
 
 Ich freue mich, mit Ihnen diesen Kurs durchführen zu können.
 
-Mit freundlichen Grüssen  
+Mit freundlichen Grüssen
 **Christoph Würsch**
 
